@@ -29,7 +29,7 @@ Complete ("real") black would be `RGB (0, 0, 0)`, white `RGB (255, 255, 255)`. S
 
 if (rgbSum <= RrgbIsBlackLimit)
 {
-	blackPixel++;
+    blackPixel++;
 }
 ```
 
@@ -42,10 +42,10 @@ Now we return the percantage of "black" pixels we found and if the percantage is
 ```csharp
 if (percantageAvg > 95.00)
 {
-	return Orientation.PORTRAIT;
+    return Orientation.PORTRAIT;
 }
 else
 {
-	return Orientation.LANDSCAPE;
+    return Orientation.LANDSCAPE;
 }
 ```
