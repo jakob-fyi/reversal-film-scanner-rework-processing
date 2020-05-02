@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>reversal_film_scanner_orientation_analyzer</RootNamespace>
+    <RootNamespace>reversal_film_scanner_rework_processing</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
