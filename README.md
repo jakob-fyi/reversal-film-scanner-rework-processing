@@ -1,7 +1,11 @@
-# Reversal Film Scanner Orientation Analayer
-A simple program to analyze the orientation of a scanned image with the amount of black pixels in certain areas.
+# Reversal Film Scanner Rework Processing
+A simple program to **batch** rework the scanned Images from my [Reversal Film Scanner Project](https://github.com/JakobVesely/reversal-film-scanner). The `.NET Core Console Application` renames, analyzes the orientation, cropping the the real image on the orientation result und rotates and flips the images.
 
-## Explanation
+## Introduction
+coming soon
+
+## Parts
+### Analyze Orientation
 The idea behind the process is to check out the areas of the scanned images, where landscape and portrait are not overlaping.
 We analayze following areas `left` and `right` (rectagles between `P1 (x1, y1)` and `P2 (x2, y2)`):
 
