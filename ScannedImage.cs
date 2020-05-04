@@ -81,11 +81,11 @@ namespace reversal_film_scanner_rework_processing
 
             if (this.GetOriantation() == Orientation.PORTRAIT)
             {
-                croppingArea = new Rectangle(1740, 170, 2340, 3550);
+                croppingArea = new Rectangle(1800, 170, 2270, 3540);
             }
             else
             {
-                croppingArea = new Rectangle(1130, 800, 3550, 2270);
+                croppingArea = new Rectangle(1170, 800, 3540, 2270);
             }
 
             this.Crop(croppingArea);
