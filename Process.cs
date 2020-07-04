@@ -20,10 +20,11 @@ namespace reversal_film_scanner_rework_processing
 		public bool Cropping { get; set; }
 		public bool Rotating { get; set; }
 		public bool FlipHorizontal { get; set; }
+		public string RenamePrefix { get; set; }
 		public int RenameStartIndex { get; set; }
 		public int ProcessedImageCounter { get; set; }
 
-		public Process(string pathToMainDirectory, string imagesFileExtension, bool rename, bool crop, bool rotate, bool flipHorizontal, int renameStartIndex)
+		public Process(string pathToMainDirectory, string imagesFileExtension, bool rename, bool crop, bool rotate, bool flipHorizontal, string renamePrefix, int renameStartIndex)
 		{
 			this.ProcessId = Guid.NewGuid();
 			this.MainDirectory = pathToMainDirectory;
@@ -35,6 +36,7 @@ namespace reversal_film_scanner_rework_processing
 			this.Cropping = crop;
 			this.Rotating = rotate;
 			this.FlipHorizontal = flipHorizontal;
+			this.RenamePrefix = renamePrefix;
 			this.RenameStartIndex = renameStartIndex;
 			this.ProcessedImageCounter = 0;
 		}
@@ -64,7 +66,7 @@ namespace reversal_film_scanner_rework_processing
 
 				System.Console.Write($"#{String.Format("{0:000}", this.ProcessedImageCounter)}: {fileName}");
 
-				if (this.Renameing == true) image.Rename("GDA", "{0:000000}", this.RenameStartIndex + this.ProcessedImageCounter);
+				if (this.Renameing == true) image.Rename(this.RenamePrefix, "{0:000000}", this.RenameStartIndex + this.ProcessedImageCounter);
 				System.Console.Write($" - Renameing: [{this.Renameing}]");
 					
 				if (this.Cropping == true) image.CropByAutoOriantation();
