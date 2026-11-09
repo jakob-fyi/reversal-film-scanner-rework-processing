@@ -8,6 +8,9 @@
   },
   "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
   "remoteUser": "vscode",
+  "containerEnv": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
   "postCreateCommand": "sudo /usr/local/bin/init-firewall.sh && dotnet restore",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
   "customizations": {

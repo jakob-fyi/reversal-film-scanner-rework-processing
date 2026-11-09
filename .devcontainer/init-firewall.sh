@@ -54,16 +54,16 @@ else
     done
 fi
 
-# NuGet (dotnet restore) and Anthropic (Claude Code) endpoints
+# NuGet (dotnet restore) and Anthropic (Claude Code API + login) endpoints.
+# No statsig.*/sentry.io here: CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 (set in
+# devcontainer.json) turns off Claude Code's telemetry/error-reporting/update
+# checks, so those hosts are never contacted and don't need to be allowlisted.
 for domain in \
     api.nuget.org \
     nuget.org \
     www.nuget.org \
     api.anthropic.com \
-    console.anthropic.com \
-    statsig.anthropic.com \
-    statsig.com \
-    sentry.io; do
+    console.anthropic.com; do
     resolve_and_add "$domain"
 done
 
