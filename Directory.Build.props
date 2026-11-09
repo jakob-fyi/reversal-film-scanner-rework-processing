@@ -12,6 +12,8 @@
     <!-- CS1591/CS1573: missing XML comments / param tags - documentation is added where it adds value. -->
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Reproducible restores: CI restores in locked mode against the committed packages.lock.json files. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
 </Project>

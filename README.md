@@ -1,4 +1,7 @@
 # Reversal Film Scanner Rework Processing
+
+[![CI](https://github.com/jakob-fyi/reversal-film-scanner-rework-processing/actions/workflows/ci.yml/badge.svg)](https://github.com/jakob-fyi/reversal-film-scanner-rework-processing/actions/workflows/ci.yml)
+
 A small **.NET 10** command line tool to **batch** rework the scanned images from my [Reversal Film Scanner Project](https://github.com/JakobVesely/reversal-film-scanner).
 It renames the images, analyzes their orientation, crops the actual slide based on that result and rotates/flips them.
 
@@ -64,7 +67,27 @@ dotnet test
 ```
 
 Tests use xUnit v3 on Microsoft.Testing.Platform, NSubstitute, `MockFileSystem`, `FakeTimeProvider` and
-`Spectre.Console.Testing`. Package versions are managed centrally in `Directory.Packages.props`.
+`Spectre.Console.Testing`. Package versions are managed centrally in `Directory.Packages.props`; restores are locked
+via the committed `packages.lock.json` files (after changing a package run `dotnet restore` and commit the lock files).
+
+```bash
+# Code coverage report (as in CI)
+dotnet test --coverage --coverage-output-format cobertura --results-directory TestResults
+dotnet tool restore
+dotnet reportgenerator -reports:"TestResults/**/*.cobertura.xml" -targetdir:TestResults/coverage-report \
+  -assemblyfilters:"-*.Tests" -filefilters:"-*/obj/*"
+```
+
+## Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every pull request and on pushes to `main`:
+
+- **Code style:** `dotnet format --verify-no-changes` (formatting, `.editorconfig` rules, analyzers)
+- **Build & test** on Ubuntu and macOS: locked restore, Release build, all tests with TRX/Markdown reports and code
+  coverage (test and coverage summary are shown on the workflow run page, results are uploaded as artifacts)
+- **Smoke test:** runs the real CLI against `sample-images/` to catch native SkiaSharp issues per OS
+
+Actions are pinned to commit SHAs; [Dependabot](.github/dependabot.yml) proposes weekly updates for actions and NuGet packages.
 
 ## Parts
 ### Analyze Orientation
@@ -77,9 +100,9 @@ Right: `P1 (4170, 700), P2 (4770, 3200)`
 
 These two areas have each a size of `600px` x `2500px` = `1.500.000`.
 
-![Landscape](https://raw.githubusercontent.com/JakobVesely/reversal-film-scanner-orientation-analyzer/master/docs/areas_landscape.jpg)
+![Landscape](docs/areas_landscape.jpg)
 
-![Portrait](https://raw.githubusercontent.com/JakobVesely/reversal-film-scanner-orientation-analyzer/master/docs/areas_portrait.jpg)
+![Portrait](docs/areas_portrait.jpg)
 
 In our program we read the color of each of these 3 million pixels and check if the are "black" or not. If a high amout of "black" pixels are found, the image has to be a portrait oriented image.
 
