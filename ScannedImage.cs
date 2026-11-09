@@ -1,17 +1,15 @@
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
+using SkiaSharp;
 
 namespace reversal_film_scanner_rework_processing
 {
     class ScannedImage
     {
-        private const double RrgbIsBlackLimit = 45; // Sum of R, G, B
-        private const double OriantationConvictionLevel = 95.00; // Percent
-        public string ImagePath { get; set; }
-        private Bitmap Image { get; set; }
+		private const double RrgbIsBlackLimit = 45; // Sum of R, G, B
+		private const double OriantationConvictionLevel = 95.00; // Percent
+		public string ImagePath { get; set; }
+        private SKBitmap Image { get; set; }
 		public ScannedImage(string path)
         {
             this.UpdatePath(path);
@@ -19,7 +17,7 @@ namespace reversal_film_scanner_rework_processing
 
         private void UpdatePath(string path){
             this.ImagePath = path;
-            this.Image = new Bitmap(this.ImagePath, true);
+            this.Image = SKBitmap.Decode(this.ImagePath);
         }
 
         public void Rename(string prefix, string numberFormat, int index)
@@ -62,8 +60,8 @@ namespace reversal_film_scanner_rework_processing
             {
                 for (int y = yStart; y < yEnd; y++)
                 {
-                    Color pixelColor = this.Image.GetPixel(x, y);
-                    int rgbSum = pixelColor.R + pixelColor.G + pixelColor.B;
+                    SKColor pixelColor = this.Image.GetPixel(x, y);
+                    int rgbSum = pixelColor.Red + pixelColor.Green + pixelColor.Blue;
 
                     if (rgbSum <= RrgbIsBlackLimit)
                     {
@@ -77,56 +75,84 @@ namespace reversal_film_scanner_rework_processing
 
         public void CropByAutoOriantation()
         {
-            Rectangle croppingArea;
+            SKRectI croppingArea;
 
             if (this.GetOriantation() == Orientation.PORTRAIT)
             {
-                croppingArea = new Rectangle(1800, 170, 2270, 3540);
+                croppingArea = ToRect(1800, 170, 2270, 3540);
             }
             else
             {
-                croppingArea = new Rectangle(1170, 800, 3540, 2270);
+                croppingArea = ToRect(1170, 800, 3540, 2270);
             }
 
             this.Crop(croppingArea);
         }
 
-        public void Crop(Rectangle croppingArea)
+        private static SKRectI ToRect(int x, int y, int width, int height)
         {
-            using (Bitmap nb = new Bitmap(croppingArea.Width, croppingArea.Height))
-            {
-                using (Graphics g = Graphics.FromImage(nb))
-                {
-                    g.DrawImage(this.Image, -croppingArea.X, -croppingArea.Y);
-                    this.Image = nb;
-                    this.Image.Save(this.ImagePath);
-                    this.UpdatePath(this.ImagePath);
-                }
-            }
+            return new SKRectI(x, y, x + width, y + height);
+        }
+
+        public void Crop(SKRectI croppingArea)
+        {
+            SKBitmap cropped = new SKBitmap(croppingArea.Width, croppingArea.Height);
+            this.Image.ExtractSubset(cropped, croppingArea);
+
+            this.Image = cropped;
+            this.Save(this.Image, this.ImagePath);
+            this.UpdatePath(this.ImagePath);
         }
 
         public void RotateFlip(bool rotate180, bool flipHorizontal)
         {
             if (rotate180 || flipHorizontal)
             {
-                RotateFlipType rotateFlipType = RotateFlipType.RotateNoneFlipNone;
-
-                if (rotate180 == true && flipHorizontal == false)
-                {
-                    rotateFlipType = RotateFlipType.Rotate180FlipNone;
-                }
-                else if (rotate180 == false && flipHorizontal == true) 
-                {
-                    rotateFlipType = RotateFlipType.RotateNoneFlipX;
-                }
-                else if (rotate180 == true && flipHorizontal == true) 
-                {
-                    rotateFlipType = RotateFlipType.Rotate180FlipX;
-                }
-
-                this.Image.RotateFlip(rotateFlipType);
-                this.Image.Save(this.ImagePath);
+                this.Image = ApplyRotateFlip(this.Image, rotate180, flipHorizontal);
+                this.Save(this.Image, this.ImagePath);
                 this.UpdatePath(this.ImagePath);
+            }
+        }
+
+        // Pixel-wise reimplementation of System.Drawing's RotateFlipType.Rotate180FlipNone / RotateNoneFlipX / Rotate180FlipX
+        private static SKBitmap ApplyRotateFlip(SKBitmap source, bool rotate180, bool flipHorizontal)
+        {
+            int width = source.Width;
+            int height = source.Height;
+            SKBitmap result = new SKBitmap(width, height, source.ColorType, source.AlphaType);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int srcX = x;
+                    int srcY = y;
+
+                    if (rotate180)
+                    {
+                        srcX = width - 1 - srcX;
+                        srcY = height - 1 - srcY;
+                    }
+
+                    if (flipHorizontal)
+                    {
+                        srcX = width - 1 - srcX;
+                    }
+
+                    result.SetPixel(x, y, source.GetPixel(srcX, srcY));
+                }
+            }
+
+            return result;
+        }
+
+        private void Save(SKBitmap bitmap, string path)
+        {
+            using (SKImage image = SKImage.FromBitmap(bitmap))
+            using (SKData data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
+            using (FileStream stream = File.Create(path))
+            {
+                data.SaveTo(stream);
             }
         }
 
