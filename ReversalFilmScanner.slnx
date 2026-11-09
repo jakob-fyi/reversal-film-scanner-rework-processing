@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ReversalFilmScanner.Rework/ReversalFilmScanner.Rework.csproj" />
+    <Project Path="src/ReversalFilmScanner.Rework.Cli/ReversalFilmScanner.Rework.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ReversalFilmScanner.Rework.Tests/ReversalFilmScanner.Rework.Tests.csproj" />
+    <Project Path="tests/ReversalFilmScanner.Rework.Cli.Tests/ReversalFilmScanner.Rework.Cli.Tests.csproj" />
+  </Folder>
+</Solution>
